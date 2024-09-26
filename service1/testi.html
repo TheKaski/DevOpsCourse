@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Stream</title>
+</head>
+
+<body>
+    <h1>Service dashboard</h1>
+    <h2>Service 1:</h2>
+    <pre id="service1-ip"></pre>
+    <h3>Processes:</h3>
+    <pre id="service1-processes"></pre>
+    <h3>uptime:</h3>
+    <pre id="service1-uptime"></pre>
+    <h3>diskspace:</h3>
+    <pre id="service1-diskspace"></pre>
+
+    <script>
+        const service1ip = document.getElementById("service1-ip");
+        const service1processes = document.getElementById("service1-processes");
+        const service1uptime = document.getElementById("service1-uptime");
+        const service1diskspace = document.getElementById("service1-diskspace");
+
+        // Create a new EventSource object
+        const eventSource = new EventSource('/realtime');
+
+        // Listen for messages from the server
+        eventSource.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            service1ip.textContent = data[0].service1.ip_address
+            service1processes.textContent = data[0].service1.running_processes
+            service1uptime.textContent = data[0].service1.uptime
+            service1diskspace.textContent = data[0].service1.available_disk_space
+        };
+
+        // Handle any errors
+        eventSource.onerror = function (event) {
+            console.error("EventSource failed:", event);
+        };
+    </script>
+</body>
+
+</html>
