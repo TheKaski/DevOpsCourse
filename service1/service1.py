@@ -5,6 +5,7 @@ import socket
 import subprocess
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
+import requests
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -63,14 +64,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def get_Service_Information(self):
-        print("Asking service 2 information")
+        logging.info("Asking service 2 information")
+        response = requests.get('http://service2:1234/info') # Ask for service 2 status
+
+        logging.info(f"Got a response: {response.text} ")
+
         return {
-            "service2": {
-                "ip_address": "Sinun hieno masiinasi 2 :)",
-                "running_processes": "Prosesseja",
-                "available_disk_space": 0,
-                "uptime": "Käynnissä ollaan"
-            }
+            "service2": response.json()
         }
     
     def get_system_info(self):

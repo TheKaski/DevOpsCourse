@@ -5,7 +5,7 @@ FROM python:3
 WORKDIR /usr/src/app
 
 # Import the dependencies using pip
-RUN pip install psutil
+RUN pip install psutil requests
 
 # Copy the project files
 COPY . .

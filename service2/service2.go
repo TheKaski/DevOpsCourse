@@ -10,10 +10,11 @@ import (
 
 const port string = ":1234"
 
+// Struct for the data to be sent in json
 type Payload struct {
 	IPAddress string `json:"ip_address"`
-	Processes string `json:"processes"`
-	DiskSpace string `json:"disk_space"`
+	Processes string `json:"running_processes"`
+	DiskSpace string `json:"available_disk_space"`
 	Uptime    string `json:"uptime"`
 }
 
@@ -21,14 +22,14 @@ type Payload struct {
 func RetrieveInformation() Payload {
 	// Command to get the IP address
 	ipCmd := "hostname -I"
-	ipAddress, _ := exec.Command("bash", "-c", ipCmd).Output()
+	ip_address, _ := exec.Command("bash", "-c", ipCmd).Output()
 
 	// Command to get running processes (limited)
 	processCmd := "ps -ax"
 	processes, _ := exec.Command("bash", "-c", processCmd).Output()
 
 	// Command to get available disk space
-	diskCmd := "df -h --output=avail / | tail -n 1"
+	diskCmd := "df -h"
 	diskSpace, _ := exec.Command("bash", "-c", diskCmd).Output()
 
 	// Command to get system uptime
@@ -37,7 +38,7 @@ func RetrieveInformation() Payload {
 
 	// Construct and return the Payload struct
 	return Payload{
-		IPAddress: strings.TrimSpace(string(ipAddress)),
+		IPAddress: strings.TrimSpace(string(ip_address)),
 		Processes: strings.TrimSpace(string(processes)),
 		DiskSpace: strings.TrimSpace(string(diskSpace)),
 		Uptime:    strings.TrimSpace(string(uptime)),

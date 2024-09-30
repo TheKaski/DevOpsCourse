@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,22 +17,43 @@
     <h3>diskspace:</h3>
     <pre id="service1-diskspace"></pre>
 
+    <h2>Service 2:</h2>
+    <pre id="service2-ip"></pre>
+    <h3>Processes:</h3>
+    <pre id="service2-processes"></pre>
+    <h3>uptime:</h3>
+    <pre id="service2-uptime"></pre>
+    <h3>diskspace:</h3>
+    <pre id="service2-diskspace"></pre>
+
     <script>
         const service1ip = document.getElementById("service1-ip");
         const service1processes = document.getElementById("service1-processes");
         const service1uptime = document.getElementById("service1-uptime");
         const service1diskspace = document.getElementById("service1-diskspace");
 
+        const service2ip = document.getElementById("service2-ip");
+        const service2processes = document.getElementById("service2-processes");
+        const service2uptime = document.getElementById("service2-uptime");
+        const service2diskspace = document.getElementById("service2-diskspace");
+
         // Create a new EventSource object
         const eventSource = new EventSource('/realtime');
 
         // Listen for messages from the server
         eventSource.onmessage = function (event) {
+            // Extract data:
             const data = JSON.parse(event.data);
+            // Service 1 details
             service1ip.textContent = data[0].service1.ip_address
             service1processes.textContent = data[0].service1.running_processes
             service1uptime.textContent = data[0].service1.uptime
             service1diskspace.textContent = data[0].service1.available_disk_space
+            // Service 2 details:
+            service2ip.textContent = data[1].service2.ip_address
+            service2processes.textContent = data[1].service2.running_processes
+            service2uptime.textContent = data[1].service2.uptime
+            service2diskspace.textContent = data[1].service2.available_disk_space
         };
 
         // Handle any errors
