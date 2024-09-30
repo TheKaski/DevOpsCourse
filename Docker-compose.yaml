@@ -4,6 +4,17 @@ services:
     build: ./service1
     ports:
       - "8199:8000"
+    depends_on:
+      - service2
+    networks:
+      - service-network
 
   service2:
     build: ./service2
+    networks:
+      - service-network
+
+# Network for service communication
+networks:
+  service-network:
+    driver: bridge
