@@ -1,0 +1,13 @@
+Findings from this excercise:
+1. New Golang language
+2. Multi stage docker images with Golang
+3. Basic http servers with both python and golang
+4. Working with VM
+
+I learned very basics of new language Go which was interesting. I tinkered with new concepts of docker containers and linux
+I learned that Go supposrts multi stage docker containers which allows it to create very minimal images which could be useful
+for microservices. I implemented all the http servers with new language and created additional "realtime" dashboard with 
+text based data stream in html. This can be accessed from /gui endpoint. It was my own test as I was curious to see how I could use
+the information gathered from the images.  I also learned more about working with VMsI set up a Debian minimal VM for this excercise
+in virtualbox and some problems I faced for example were slow internet speeds which I managed to debug and improve succesfully
+as well as installing packages and runing docker commands.
