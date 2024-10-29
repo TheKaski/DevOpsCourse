@@ -1,11 +1,13 @@
 # This file contains implementation for basic http API using Python
 import json
+import docker
 import logging
 import socket
 import subprocess
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 import requests
+import os
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +16,12 @@ logging.basicConfig(level=logging.INFO)
 class HTTPRequestHandler(BaseHTTPRequestHandler):
     # Create endpoint for GET request:
     def do_GET(self):
+
+        if self.path == "/shutdown":
+            self.send_response(200)
+            self.end_headers()
+            self.shutdown_all_containers()
+            return
         
         # Additional endpoint for retrieving "real time" data stream
         if self.path == "/realtime":
@@ -101,10 +109,24 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         }
         
         return info    
+    
+    def shutdown_all_containers(self):
+        client = docker.from_env()
+        currentContainer = client.containers.get(os.getenv('HOSTNAME'))
+        currentID = currentContainer.id
+        logging.info("I am" , currentID)
+        try:
+            for container in client.containers.list():
+                logging.info("Shutting down service" , container.id)
+                if container.id != currentID:
+                    container.stop()
+            currentContainer.stop()
+        except Exception as e:
+            logging.error(f"Error stopping the containers: {e}")
 
 # Start the server:
 if __name__ == '__main__':
-    server = HTTPServer(('0.0.0.0', 8000), HTTPRequestHandler)
+    server = HTTPServer(('0.0.0.0', 5050), HTTPRequestHandler)
     logging.info('Starting httpd...\n')
     try:
         server.serve_forever()
