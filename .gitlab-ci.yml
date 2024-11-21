@@ -6,10 +6,12 @@ stages:          # List of stages for jobs, and their order of execution
   - test
   - deploy
 
+before_script:
+  - apt-get update && apt-get install -y docker.io docker-compose  # Install Docker and Docker Compose
+  - docker info
 build-job:       # This job runs in the build stage, which runs first with docker compose.
   stage: build
   script:
-    - apt-get update && apt-get install -y docker.io docker-compose
     - echo "Setting up environment with Docker Compose"
     - docker-compose -f docker-compose.yaml up -d  # Start services in detached mode
 
