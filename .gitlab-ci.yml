@@ -1,27 +1,15 @@
 # Basic pipeline for the project. 
-
-#I want to use Docker image that has Docker and Docker Compose installed to run my project
-image: docker:latest
-
-services:
-  - docker:latest  # Start Docker service
+image: ubuntu:20.04
 
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
   - deploy
 
-variables:
-  DOCKER_HOST: unix:///var/run/docker.sock  # Point to the Docker socket
-
-before_script:
-  - apk add --no-cache docker  # Install Docker client inside the container
-  - docker info  # Check Docker info to verify the connection
-
-
 build-job:       # This job runs in the build stage, which runs first with docker compose.
   stage: build
   script:
+    - apt-get update && apt-get install -y docker.io docker-compose
     - echo "Setting up environment with Docker Compose"
     - docker-compose -f docker-compose.yaml up -d  # Start services in detached mode
 
