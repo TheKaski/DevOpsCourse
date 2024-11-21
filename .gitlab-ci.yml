@@ -15,7 +15,7 @@ build-job:       # This job runs in the build stage, which runs first with docke
   stage: build
   script:
     - echo "Setting up environment with Docker Compose"
-    - docker-compose -f docker-compose.yml up -d  # Start services in detached mode
+    - docker-compose -f docker-compose.yaml up -d  # Start services in detached mode
 
 
 unit-test-job:   # This job runs in the test stage.
