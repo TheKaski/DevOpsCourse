@@ -1,7 +1,7 @@
 # Basic pipeline for the project. 
 
 #I want to use Docker image that has Docker and Docker Compose installed to run my project
-image: docker:20.10.16
+image: docker:latest
 
 stages:          # List of stages for jobs, and their order of execution
   - build
@@ -10,9 +10,6 @@ stages:          # List of stages for jobs, and their order of execution
 
 build-job:       # This job runs in the build stage, which runs first with docker compose.
   stage: build
-  services:
-  - docker:20.10.16-dind  # Docker-in-Docker for the runner to run Docker commands
-  
   script:
     - echo "Setting up environment with Docker Compose"
     - docker-compose -f docker-compose.yaml up -d  # Start services in detached mode
