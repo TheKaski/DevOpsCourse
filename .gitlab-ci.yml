@@ -9,8 +9,8 @@ stages: # List of stages for jobs, and their order of execution
 build-job: # This job runs in the build stage, which runs first with docker compose.
   stage: build
   before_script:
-    - apt-get update && apt-get install -y docker.io docker-compose python3 python3-pip # Install Docker and Docker Compose
-    - systemctl start docker # Start the docker daemon
+    - sudo apt-get update && apt-get install -y docker.io docker-compose python3 python3-pip # Install Docker and Docker Compose
+    - sudo systemctl start docker # Start the docker daemon
     - docker info
   script:
     - echo "Setting up environment with Docker Compose"
