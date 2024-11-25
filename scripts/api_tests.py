@@ -3,7 +3,7 @@
 import requests
 
 # Define the baseUrl of the service under testing
-BASE_URL = "http://localhost:8197" # Base url which should be exposed locally by the docker application
+BASE_URL = "http://host.docker.internal:8197" # Base url which should be exposed locally by the docker application
 
 # Function for sending the PUT/state request with the state as payload
 def set_state(state):
