@@ -10,7 +10,7 @@ build-job: # This job runs in the build stage, which runs first with docker comp
   stage: build
   before_script:
     - apt-get update && apt-get install -y docker.io docker-compose sudo # Install Docker and Docker Compose
-    - systemctl start docker
+    - sudo systemctl start docker
     - docker info
   script:
     - echo "Setting up environment with Docker Compose"
