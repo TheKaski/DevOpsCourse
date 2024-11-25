@@ -20,6 +20,7 @@ api-test-job: # This job runs in the test stage.
   stage: test # It only starts when the job in the build stage completes successfully.
   before_script:
     - sudo apt-get install -y python3-requests # Python dependency for testing the endpoints
+    - docker-compose ps
   script:
     - echo "Running api tests..."
     - python3 scripts/api_tests.py # Try running the test script
