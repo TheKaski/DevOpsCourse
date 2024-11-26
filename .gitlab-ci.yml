@@ -19,8 +19,7 @@ api-test-job: # This job runs in the test stage.
   stage: test # It only starts when the job in the build stage completes successfully.
   before_script:
     - docker-compose ps
-    - docker-compose logs nginx
-    - curl http:/0.0.0.0:8197
+    - curl http://0.0.0.0:8197
 
   script:
     - echo "Running api tests..."
