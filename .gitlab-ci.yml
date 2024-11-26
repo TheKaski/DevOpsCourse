@@ -20,6 +20,7 @@ api-test-job: # This job runs in the test stage.
   before_script:
     - docker-compose ps
     - curl http://0.0.0.0:8197
+    - docker-compose logs nginx
 
   script:
     - echo "Running api tests..."
