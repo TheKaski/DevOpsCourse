@@ -24,7 +24,7 @@ services:
     container_name: nginx
     ports:
       - "8198:80"
-      - "8197:86"
+      - "8197:443"
     networks:
       - loadbalancing
     depends_on:
