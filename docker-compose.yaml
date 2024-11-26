@@ -29,17 +29,7 @@ services:
       - loadbalancing
     depends_on:
       - service1
-
-  test:
-    image: python:3.9-slim  # You can use a Python image or any image with the dependencies you need
-    depends_on:
-      - service1  # Ensure the test container waits for service1 to start
-    networks:
-      - service-network
-    volumes:
-      - ./scripts:/scripts  # Mount your local test scripts into the container
-    command: ["python", "./scripts/api_tests.py"]  # Command to run the test script
-
+      
 # Network for service communication
 networks:
   service-network:
