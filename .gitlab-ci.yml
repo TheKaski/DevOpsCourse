@@ -1,6 +1,4 @@
 # Basic pipeline for the project.
-image: ubuntu:20.04 # This works for now, however woulc be wise to try to choose a ready made image with as much ready tools installed in the first place
-
 stages: # List of stages for jobs, and their order of execution
   - build
   - test
