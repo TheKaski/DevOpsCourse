@@ -29,7 +29,7 @@ services:
       - loadbalancing
     depends_on:
       - service1
-      
+
 # Network for service communication
 networks:
   service-network:
