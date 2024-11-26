@@ -16,9 +16,11 @@ build-job: # This job runs in the build stage, which runs first with docker comp
 
 api-test-job: # This job runs in the test stage.
   stage: test # It only starts when the job in the build stage completes successfully.
+  before_script:
+    - docker-compose ps
   script:
     - echo "Running api tests..."
-    - docker-compose ps
+    - python3 scripts/api_tests.py # Try running the test script
 
 deploy-job: # This job runs in the deploy stage.
   stage: deploy # It only runs when *both* jobs in the test stage complete successfully.
