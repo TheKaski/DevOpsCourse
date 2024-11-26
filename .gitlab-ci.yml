@@ -7,7 +7,7 @@ stages: # List of stages for jobs, and their order of execution
 build-job: # This job runs in the build stage, which runs first with docker compose.
   stage: build
   before_script:
-    - apt-get update && apt-get install -y docker.io docker-compose sudo # Install Docker and Docker Compose
+    - apt-get update && apt-get install -y docker.io docker-compose sudo python3-requests # Install Docker and Docker Compose
     - sudo systemctl start docker
     - docker info
   script:
@@ -17,7 +17,6 @@ build-job: # This job runs in the build stage, which runs first with docker comp
 api-test-job: # This job runs in the test stage.
   stage: test # It only starts when the job in the build stage completes successfully.
   before_script:
-    - sudo apt-get install -y python3-requests # Python dependency for testing the endpoints
     - docker-compose ps
   script:
     - echo "Running api tests..."
