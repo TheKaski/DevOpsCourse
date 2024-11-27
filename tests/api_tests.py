@@ -25,6 +25,9 @@ def get_request():
     """Trigger the request endpoint."""
     response = requests.get(f"{BASE_URL}/request")
     assert response.status_code == 200, f"Failed to send request: {response.text}"
+    # Check if the Content-Type is 'text/plain'
+    content_type = response.headers.get('Content-Type')
+    assert 'text/plain' in content_type, f"Expected 'text/plain', but got {content_type}"
     return response.text.strip()
 
 # function for sending a GET/run-log get log of the system states in text form
@@ -58,17 +61,27 @@ def test_shutdown_state():
     set_state("SHUTDOWN")
     assert get_state() == "PAGE_NOT_FOUND", "system should be completely offline after shutting down"
 
-def test_initial_state_request():
+
+def test_state_should_equal_to(expected):
     """Test retrieving the state from the REST API"""
     output = get_state()
-    assert output == "INIT", f"System should return the INIT state as original state Instead was {output}"
+    assert output == expected, f"System should return the {expected} state as original state Instead was {output}"
+
+def test_request_endpoint():
+    """Test retrieving the information of services from the REST API"""
+    output = get_request()
+
+     # Check if the output contains both 'service1' and 'service2' in the plain text
+    assert "service1" in output, f"System should return state including 'service1', instead got: {output}"
+    assert "service2" in output, f"System should return state including 'service2', instead got: {output}"
 
 
 #The main loop of this test program
 if __name__ == "__main__":
     try:
         print("Running the tests now...")
-        test_initial_state_request()
+        test_state_should_equal_to("INIT")
+        test_request_endpoint()
         print("All tests passed!")
     # If any of the tests asser an error, the test will fail and report the error    
     except AssertionError as err:
