@@ -80,6 +80,20 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(state.encode())  # Encode to bytes as required by `wfile`
 
             return
+        
+        # Main endpoint for the excercise data retrieval: 
+        if self.path == "/request":
+            # Send the response
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain")
+            self.end_headers()
+            # Extract information about local system
+            informationDump = self.get_system_info()
+            # Retrieve service2 information
+            service2Information = self.get_Service_Information()
+            response = [informationDump, service2Information]
+            self.wfile.write(response.encode())
+            return
 
         # Anything else will result in 404     
         self.send_response(404)

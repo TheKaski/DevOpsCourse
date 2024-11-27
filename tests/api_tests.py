@@ -66,14 +66,15 @@ def test_state_should_equal_to(expected):
     """Test retrieving the state from the REST API"""
     output = get_state()
     assert output == expected, f"System should return the {expected} state as original state Instead was {output}"
+    print("State test passed")
 
 def test_request_endpoint():
     """Test retrieving the information of services from the REST API"""
     output = get_request()
-
      # Check if the output contains both 'service1' and 'service2' in the plain text
     assert "service1" in output, f"System should return state including 'service1', instead got: {output}"
     assert "service2" in output, f"System should return state including 'service2', instead got: {output}"
+    print("Request test passed")
 
 
 #The main loop of this test program
