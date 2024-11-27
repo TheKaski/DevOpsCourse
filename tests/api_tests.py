@@ -60,7 +60,8 @@ def test_shutdown_state():
 
 def test_initial_state_request():
     """Test retrieving the state from the REST API"""
-    assert get_state() == "INIT", "System should return the INIT state as original state"
+    output = get_state()
+    assert output == "INIT", f"System should return the INIT state as original state Instead was {output}"
 
 
 #The main loop of this test program
