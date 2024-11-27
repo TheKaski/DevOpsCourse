@@ -24,6 +24,7 @@ services:
     container_name: nginx
     ports:
       - "8198:80"
+      - "8198:81"
     networks:
       - loadbalancing
     depends_on:
@@ -33,7 +34,6 @@ services:
     build: ./apigate
     container_name: apiGate
     ports:
-      - "8197:80"
     networks:
       - loadbalancing
     depends_on:

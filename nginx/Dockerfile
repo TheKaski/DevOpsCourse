@@ -11,7 +11,7 @@ RUN htpasswd -bc /etc/nginx/.htpasswd admin secret
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY index.html /usr/share/nginx/html/
 
-EXPOSE 80
-EXPOSE 443
+EXPOSE 80 81
+
 
 CMD ["nginx", "-g", "daemon off;"]
