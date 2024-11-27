@@ -62,6 +62,7 @@ def test_shutdown_state():
 if __name__ == "__main__":
     try:
         print("Running the tests now...")
+        print("State should return the state INIT when system is just started")
         get_state() # First test if state can be returned
         print("All tests passed!")
     # If any of the tests asser an error, the test will fail and report the error    
