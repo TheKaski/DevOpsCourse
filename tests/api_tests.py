@@ -58,12 +58,16 @@ def test_shutdown_state():
     set_state("SHUTDOWN")
     assert get_state() == "PAGE_NOT_FOUND", "system should be completely offline after shutting down"
 
+def test_initial_state_request():
+    """Test retrieving the state from the REST API"""
+    assert get_state() == "INIT", "System should return the INIT state as original state"
+
+
 #The main loop of this test program
 if __name__ == "__main__":
     try:
         print("Running the tests now...")
-        print("State should return the state INIT when system is just started")
-        get_state() # First test if state can be returned
+        test_initial_state_request()
         print("All tests passed!")
     # If any of the tests asser an error, the test will fail and report the error    
     except AssertionError as err:
