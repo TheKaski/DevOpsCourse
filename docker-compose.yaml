@@ -33,7 +33,6 @@ services:
   apigate:
     build: ./apigate
     container_name: apiGate
-    ports:
     networks:
       - loadbalancing
     depends_on:
