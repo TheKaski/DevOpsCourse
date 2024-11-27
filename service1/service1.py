@@ -85,14 +85,20 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         if self.path == "/request":
             # Send the response
             self.send_response(200)
-            self.send_header("Content-Type", "text/plain")
+            self.send_header("Content-Type", "text/plain")  # Set content type to plain text
             self.end_headers()
-            # Extract information about local system
+
+            # Extract information about the local system
             informationDump = self.get_system_info()
             # Retrieve service2 information
             service2Information = self.get_Service_Information()
-            response = [informationDump, service2Information]
-            self.wfile.write(response.encode())
+
+            # Prepare the response to be in plain text format (string)
+            # Convert both information dumps to a human-readable string
+            response_str = f"service1 Information:\n{informationDump}\n\nservice2 Information:\n{service2Information}"
+
+            # Encode the string into bytes before sending
+            self.wfile.write(response_str.encode())
             return
 
         # Anything else will result in 404     
