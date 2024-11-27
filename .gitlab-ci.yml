@@ -20,7 +20,6 @@ api-test-job: # This job runs in the test stage.
     - docker-compose ps
     - curl http://127.0.0.1:8197
     - curl http://127.0.0.1:8197/state
-    - curl http://localhost:8197/request
     - docker-compose logs
   script:
     - echo "Running api tests..."
