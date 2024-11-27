@@ -71,6 +71,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         
         # NEW Feature of returning the STATE variable when asked:
         if self.path =="/state":
+            logging.info("I RECEIVED A API REQUEST FOR CURRENT STATE")
             # Serve the HTML file
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")
@@ -83,6 +84,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         
         # Main endpoint for the excercise data retrieval: 
         if self.path == "/request":
+            logging.info("I RECEIVED A API REQUEST FOR CURRENT SERVICE INFO")
             # Send the response
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")  # Set content type to plain text
