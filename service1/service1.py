@@ -12,11 +12,14 @@ import os
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
+# Service 1 should keep record of the STATE
+
+state = "INIT"
+
 # Define basic HTTPRequestHandler:
 class HTTPRequestHandler(BaseHTTPRequestHandler):
     # Create endpoint for GET request:
     def do_GET(self):
-
         if self.path == "/shutdown":
             self.send_response(200)
             self.end_headers()
@@ -31,7 +34,6 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Cache-Control', 'no-cache')
             self.send_header('Connection', 'keep-alive')
             self.end_headers()
-
             while True:
                 # Extract information about local system
                 informationDump = self.get_system_info()
@@ -65,6 +67,18 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
             with open("testi.html", "r") as f:
                 self.wfile.write(f.read().encode())
+            return
+        
+        # NEW Feature of returning the STATE variable when asked:
+        if self.path =="/state":
+            # Serve the HTML file
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain")
+            self.end_headers()
+
+            # Write the state data as plain text to the response body
+            self.wfile.write(state.encode())  # Encode to bytes as required by `wfile`
+
             return
 
         # Anything else will result in 404     

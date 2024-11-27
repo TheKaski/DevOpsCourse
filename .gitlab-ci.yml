@@ -21,7 +21,7 @@ api-test-job: # This job runs in the test stage.
     - curl http://127.0.0.1:8197
   script:
     - echo "Running api tests..."
-    - python3 scripts/api_tests.py # Try running the test script
+    - python3 tests/api_tests.py # Try running the test script
 
 deploy-job: # This job runs in the deploy stage.
   stage: deploy # It only runs when *both* jobs in the test stage complete successfully.

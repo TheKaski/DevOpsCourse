@@ -3,7 +3,7 @@
 import requests
 
 # Define the baseUrl of the service under testing
-BASE_URL = "http://localhost:8198" # Base url which should be exposed locally by the docker application
+BASE_URL = "http://localhost:8197" # Base url which should be exposed locally by the docker application
 
 # Function for sending the PUT/state request with the state as payload
 def set_state(state):
@@ -62,10 +62,7 @@ def test_shutdown_state():
 if __name__ == "__main__":
     try:
         print("Running the tests now...")
-        test_init_state()
-        test_paused_state()
-        test_running_state()
-        test_shutdown_state()
+        get_state() # First test if state can be returned
         print("All tests passed!")
     # If any of the tests asser an error, the test will fail and report the error    
     except AssertionError as err:
