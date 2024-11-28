@@ -21,7 +21,7 @@ api-test-job: # This job runs in the test stage.
     - docker-compose ps
     - curl http://127.0.0.1:8197
     - sleep 10
-    - curl -i http://127.0.0.1:8198/api/state
+    - curl -i https://www.tuni.fi/fi
   script:
     - echo "Running api tests..."
     - python3 tests/api_tests.py # Try running the test script
