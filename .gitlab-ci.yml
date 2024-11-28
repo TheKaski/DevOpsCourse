@@ -19,7 +19,9 @@ api-test-job: # This job runs in the test stage.
   stage: test # It only starts when the job in the build stage completes successfully.
   before_script:
     - apk add --no-cache curl python3 py3-pip # Install curl for Alpine-based images (docker:latest uses Alpine)
-    - python3 -m pip install requests
+    - python3 -m venv /tmp/venv # Create a virtual environment
+    - . /tmp/venv/bin/activate # Activate the virtual environment
+    - pip install requests # Install requests inside the virtual environment
     - sleep 10
     - docker-compose ps
     - DOCKER_HOST_IP=$(docker network inspect bridge --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
@@ -27,6 +29,7 @@ api-test-job: # This job runs in the test stage.
     - sleep 10
     - curl -i http://$DOCKER_HOST_IP:8197/state
   script:
+    - . /tmp/venv/bin/activate # Ensure the virtual environment is active
     - echo "Running api tests..."
     - python3 tests/api_tests.py # Try running the test script
 
