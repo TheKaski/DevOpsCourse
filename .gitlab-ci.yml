@@ -26,7 +26,6 @@ api-test-job: # This job runs in the test stage.
     - sleep 10
     - curl -i http://$DOCKER_HOST_IP:8197/state
   script:
-    - . /tmp/venv/bin/activate # Ensure the virtual environment is active
     - echo "Running api tests..."
     - python3 tests/api_tests.py # Try running the test script
 
