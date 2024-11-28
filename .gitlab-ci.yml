@@ -21,9 +21,10 @@ api-test-job: # This job runs in the test stage.
     - apk add --no-cache curl # Install curl for Alpine-based images (docker:latest uses Alpine)
     - sleep 10
     - docker-compose ps
-    - curl http://127.0.0.1:8197
+    - DOCKER_HOST_IP=$(docker network inspect bridge --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
+    - curl http://$DOCKER_HOST_IP:8197
     - sleep 10
-    - curl -i http://127.0.0.1:8197/state
+    - curl -i http://$DOCKER_HOST_IP:8197/state
   script:
     - echo "Running api tests..."
     - python3 tests/api_tests.py # Try running the test script
