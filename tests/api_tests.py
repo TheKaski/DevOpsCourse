@@ -17,7 +17,7 @@ def get_state():
     response = requests.get(f"{BASE_URL}/state")
     if response.status_code == 404:
         return f"PAGE_NOT_FOUND {BASE_URL}"
-    assert response.status_code == 200, f"Failed to get state from {BASE_URL}: {response.text}"
+    assert response.status_code == 200, f"Failed to get state from {BASE_URL}/state: {response.text}"
     return response.text.strip()
 
 # Function for sending a GET/request to get information about the services
