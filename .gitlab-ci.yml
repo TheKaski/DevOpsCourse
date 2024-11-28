@@ -1,5 +1,6 @@
-image: ubuntu:latest
-
+# Docker service is required for Docker-in-Docker
+services:
+  - docker:20.10.7
 # Basic pipeline for the project.
 stages: # List of stages for jobs, and their order of execution
   - build
@@ -8,6 +9,7 @@ stages: # List of stages for jobs, and their order of execution
 
 build-job: # This job runs in the build stage, which runs first with docker compose.
   stage: build
+  image: ubuntu:latest
   before_script:
     - apt-get update && apt-get install -y docker.io docker-compose sudo python3-requests # Install Docker and Docker Compose
     - docker info
@@ -16,6 +18,7 @@ build-job: # This job runs in the build stage, which runs first with docker comp
     - docker-compose -f docker-compose.yaml up -d # Start services in detached mode
 
 api-test-job: # This job runs in the test stage.
+  image: ubuntu:latest
   stage: test # It only starts when the job in the build stage completes successfully.
   before_script:
     - sleep 10
