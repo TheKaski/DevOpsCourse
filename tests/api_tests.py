@@ -1,9 +1,11 @@
 # This is a really simple API test developped for CI pipeline excercise
 # This script will be used to test a built Docker application endpoints
 import requests
+import os
 
 # Define the baseUrl of the service under testing
-BASE_URL = "http://127.0.0.1:8197" # Base url which should be exposed locally by the docker application
+host = os.getenv('DOCKER_HOST_IP', '127.0.0.1')  # Default to '127.0.0.1' if the environment variable is not set
+BASE_URL =  f"http://{host}:8197"
 
 # Function for sending the PUT/state request with the state as payload
 def set_state(state):
