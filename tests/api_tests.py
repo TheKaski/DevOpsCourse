@@ -16,7 +16,7 @@ def get_state():
     """Get the current state using the GET /state endpoint."""
     response = requests.get(f"{BASE_URL}/state")
     if response.status_code == 404:
-        return f"PAGE_NOT_FOUND {BASE_URL}"
+        return f"PAGE_NOT_FOUND {BASE_URL}/state"
     assert response.status_code == 200, f"Failed to get state from {BASE_URL}/state: {response.text}"
     return response.text.strip()
 
