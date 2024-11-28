@@ -17,11 +17,11 @@ build-job: # This job runs in the build stage, which runs first with docker comp
 api-test-job: # This job runs in the test stage.
   stage: test # It only starts when the job in the build stage completes successfully.
   before_script:
-    - sleep 30
+    - sleep 10
     - docker-compose ps
     - curl http://127.0.0.1:8197
     - sleep 10
-    - curl -i http://127.0.0.1:8197
+    - curl -i http://127.0.0.1:8197/state
   script:
     - echo "Running api tests..."
     - python3 tests/api_tests.py # Try running the test script
