@@ -82,7 +82,7 @@ def test_request_endpoint():
 #The main loop of this test program
 if __name__ == "__main__":
     try:
-        print("Running the tests now...")
+        print(f"Running the tests now... the url is {BASE_URL}")
         test_state_should_equal_to("INIT")
         test_request_endpoint()
         print("All tests passed!")
