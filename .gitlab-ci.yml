@@ -8,7 +8,6 @@ build-job: # This job runs in the build stage, which runs first with docker comp
   stage: build
   image: docker:latest
   before_script:
-    - apk add --no-cache curl # Install curl for Alpine-based images (docker:latest uses Alpine)
     - docker info
     - docker-compose -v
   script:
@@ -19,6 +18,7 @@ api-test-job: # This job runs in the test stage.
   image: docker:latest
   stage: test # It only starts when the job in the build stage completes successfully.
   before_script:
+    - apk add --no-cache curl # Install curl for Alpine-based images (docker:latest uses Alpine)
     - sleep 10
     - docker-compose ps
     - curl http://127.0.0.1:8197
