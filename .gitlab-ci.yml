@@ -1,3 +1,5 @@
+image: ubuntu:latest
+
 # Basic pipeline for the project.
 stages: # List of stages for jobs, and their order of execution
   - build
