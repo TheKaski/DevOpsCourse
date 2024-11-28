@@ -4,10 +4,6 @@ stages: # List of stages for jobs, and their order of execution
   - test
   - deploy
 
-# Bind the Docker socket to access the host's Docker daemon
-volumes:
-  - /var/run/docker.sock:/var/run/docker.sock # This is crucial for the container to access the host's Docker daemon
-
 build-job: # This job runs in the build stage, which runs first with docker compose.
   stage: build
   image: ubuntu:latest
