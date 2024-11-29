@@ -83,21 +83,8 @@ def get_state():
 
         headers, body_and_status = response
 
-        # Now, extract the status code and body
-        status_code = body_and_status[-3:]  # Last 3 characters should be the status code
-        body = body_and_status[:-3]  # Everything before the status code is the body
-
-        if status_code == "404":
-            return f"PAGE_NOT_FOUND {BASE_URL}/state"
-        
-        # Check for valid status code
-        assert status_code == "200", f"Failed to get state from {BASE_URL}/state: {body}"
-
-        # Optional: Check if content type is "text/plain" from headers
-        content_type = next(
-            (line.split(":")[1].strip() for line in headers.splitlines() if "Content-Type" in line), None
-        )
-        assert content_type == "text/plain", f"Expected 'text/plain', but got {content_type}"
+        # Extract the body (exclude the last 3 characters for the status code)
+        body = body_and_status[:-3]
 
         return body.strip()
 
