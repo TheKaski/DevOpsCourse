@@ -24,7 +24,7 @@ api-test-job: # This job runs in the test stage.
     - DOCKER_HOST_IP=$(docker network inspect bridge --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
     - curl http://$DOCKER_HOST_IP:8197
     - sleep 10
-    - curl -i http://$DOCKER_HOST_IP:8197/state
+    - curl -s -D- http://$DOCKER_HOST_IP:8197/state
   script:
     - echo "Running api tests..."
     - python3 tests/api_tests.py # Try running the test script

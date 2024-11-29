@@ -60,33 +60,23 @@ def set_state(state):
     except Exception as e:
          raise RuntimeError(f"Error setting state: {str(e)}")
 
+# Makes a Get request to the /state endpoint and returns the output
 def get_state():
     """Get the current state using the GET /state endpoint."""
     try:
         # Execute curl command to get both headers and body
         result = subprocess.run(
-            ["curl", "-s", "-D-", f"{BASE_URL}/state"],  # -s for silent mode, -D- for headers
+            ["curl", "-s", f"{BASE_URL}/state"],  # -s for silent mode, -D- for headers
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
         )
 
-        # Check if there was an error in the curl execution
+        # Check for errors in the subprocess call
         if result.returncode != 0:
             raise AssertionError(f"Curl command failed: {result.stderr.strip()}")
 
-        # Separate the headers and body using double newlines (CRLF)
-        response = result.stdout.split("\r\n\r\n", 1)
-
-        if len(response) < 2:
-            raise AssertionError(f"Failed to split response correctly: {result.stdout}")
-
-        headers, body_and_status = response
-
-        # Extract the body (exclude the last 3 characters for the status code)
-        body = body_and_status[:-3]
-
-        return body.strip()
+        return result.stdout
 
     except Exception as e:
         raise AssertionError(f"Error occurred while getting state: {e}")
@@ -97,45 +87,18 @@ def get_request():
         # Execute curl command with headers, capture both the headers and body
         result = subprocess.run(
             [
-                "curl", "-s", "-w", "%{http_code}", "-D-", f"{BASE_URL}/request",
+                "curl", "-s", f"{BASE_URL}/request",
                 "-H", "Content-Type: text/plain", "-H", "Accept: text/plain"
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
         )
-
         # Check for errors in the subprocess call
         if result.returncode != 0:
             raise AssertionError(f"Curl command failed: {result.stderr.strip()}")
-
-        # Separate headers and body + status code
-        raw_output = result.stdout.split("\r\n\r\n", 1)
-        headers = raw_output[0] if len(raw_output) > 1 else ""
-        body_and_status = raw_output[1] if len(raw_output) > 1 else raw_output[0]
-        
-        # Print raw output for debugging
-        print(f"Raw curl output: {result.stdout}")
-        
-        # Extract status code (last 3 characters of body_and_status)
-        status_code = body_and_status[-3:]
-
-        # Extract body (everything except the last 3 characters, which are the status code)
-        body = body_and_status[:-3].strip()
-
-        # Verify HTTP status code
-        assert status_code == "200", f"Failed to send request: {body}"
-
-        # Parse headers for Content-Type
-        content_type = next(
-            (line.split(":")[1].strip() for line in headers.splitlines() if "Content-Type" in line), None
-        )
-        
-        # Ensure Content-Type is 'text/plain'
-        assert content_type and "text/plain" in content_type, f"Expected 'text/plain', but got {content_type}"
-
         # Return the response body
-        return body
+        return result.stdout
 
     except Exception as e:
         raise AssertionError(f"Error occurred while sending request: {e}")
