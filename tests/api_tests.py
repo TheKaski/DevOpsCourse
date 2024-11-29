@@ -36,27 +36,24 @@ class TestResult:
 def set_state(state):
     """Set the system state using the PUT /state endpoint."""
     try:
-         # Use curl to make the PUT request
-         result = subprocess.run(
-             [
-                 "curl",
-                 "-X", "PUT",  # Specify the HTTP method
-                 f"{BASE_URL}/state",  # Target URL
-                 "-d", state  # Data payload
-             ],
-             capture_output=True,  # Capture the output
-             text=True,  # Get the output as text
-         )
-         print(f" The output is: {result.stdout}")
-
-         # Check if the HTTP request was successful
-         if result.returncode != 0:
-             raise RuntimeError(f"Curl command failed: {result.stderr}")
-
-         if "200 OK" not in result.stdout:
-             raise AssertionError(f"Failed to set state to {state}: {result.stdout}")
-
-         print(f"State set successfully: {state}")
+        # Use curl to make the PUT request
+        result = subprocess.run(
+            [
+                "curl",
+                "-X", "PUT",  # Specify the HTTP method
+                f"{BASE_URL}/state",  # Target URL
+                "-d", state  # Data payload
+            ],
+            capture_output=True,  # Capture the output
+            text=True,  # Get the output as text
+        )
+        print(f" The output from {BASE_URL} PUT  /state is: {result.stdout}")
+        # Check if the HTTP request was successful
+        if result.returncode != 0:
+            raise RuntimeError(f"Curl command failed: {result.stderr}")
+        if "200 OK" not in result.stdout:
+            raise AssertionError(f"Failed to set state to {state}: {result.stdout}")
+        print(f"State set successfully: {state}")
 
     except Exception as e:
          raise RuntimeError(f"Error setting state: {str(e)}")
@@ -66,13 +63,9 @@ def get_state():
     """Get the current state using the GET /state endpoint."""
     try:
         # Execute curl command to get both headers and body
-        result = subprocess.run(
-            ["curl", "-s", f"{BASE_URL}/state"],  # -s for silent mode, -D- for headers
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-        print(f" The output is: {result.stdout}")
+        result = subprocess.run(f"curl -s -D- ${BASE_URL}",shell=True, text=True, capture_output=True)
+        
+        print(f" The output from {BASE_URL} GET /state is: {result.stdout}")
 
         # Check for errors in the subprocess call
         if result.returncode != 0:
@@ -96,7 +89,7 @@ def get_request():
             stderr=subprocess.PIPE,
             text=True,
         )
-        print(f" The output is: {result.stdout}")
+        print(f" The output from {BASE_URL} GET /request is: {result.stdout}")
         # Check for errors in the subprocess call
         if result.returncode != 0:
             raise AssertionError(f"Curl command failed: {result.stderr.strip()}")
