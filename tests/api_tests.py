@@ -64,22 +64,34 @@ def set_state(state):
 def get_state():
     """Get the current state using the GET /state endpoint."""
     try:
-        # Execute curl command
+        # Execute curl command to get both headers and body
         result = subprocess.run(
-            ["curl", "-s", "-w", "%{http_code}", f"{BASE_URL}/state"],
+            ["curl", "-s", "-D-", f"{BASE_URL}/state"],  # Include -D to separate headers
             stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
         )
-        # Separate the body and HTTP status code
-        response = result.stdout
-        body, status_code = response[:-3], response[-3:]
+
+        # Split the response into headers and body using a double newline as the separator
+        headers, body = result.stdout.split("\r\n\r\n", 1)  # Headers and body are separated by "\r\n\r\n"
+
+        # Get status code from headers (first line)
+        status_code = headers.split()[1]  # Status code is the second element in the first header line
+        
         if status_code == "404":
             return f"PAGE_NOT_FOUND {BASE_URL}/state"
+        
+        # Ensure status code is 200
         assert status_code == "200", f"Failed to get state from {BASE_URL}/state: {body}"
+
+        # Optionally check the content type header if needed
+        content_type = next((line.split(":")[1].strip() for line in headers.splitlines() if "Content-Type" in line), None)
+        assert content_type == "text/plain", f"Expected 'text/plain' content type, but got {content_type}"
+
         return body.strip()
+    
     except Exception as e:
         raise AssertionError(f"Error occurred while getting state: {e}")
-
 
 def get_request():
     """Trigger the request endpoint and validate Content-Type and status with curl."""
