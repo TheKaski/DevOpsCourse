@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Function to get the current state from the /state endpoint
 get_state() {
