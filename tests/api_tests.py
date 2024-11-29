@@ -65,7 +65,7 @@ def get_state():
        # Execute curl command with headers, capture both the headers and body
         result = subprocess.run(
             [
-                "curl", "-s", "127.0.0.1/state",
+                "curl", "-s", "127.0.0.1:8197/state",
                 "-H", "Content-Type: text/plain", "-H", "Accept: text/plain"
             ],
             stdout=subprocess.PIPE,
