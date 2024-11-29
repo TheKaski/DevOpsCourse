@@ -143,10 +143,39 @@ def test_request_endpoint():
     assert "service1" in output, f"System should return state including 'service1', instead got: {output}"
     assert "service2" in output, f"System should return state including 'service2', instead got: {output}"
 
+def test_set_state():
+    """Test for setting the state to something and then checking if it was changed"""
+    original_state = get_state()
+    end_state = None
+
+    # If the state is "INIT", log in (or perform required action) to change state
+    if original_state == "INIT" and end_state == None:
+        print("System is in 'INIT' state. Logging in...")
+        set_state("RUNNING")  # logging in means changing state to "RUNNING"
+        print("Logged in. Checking state again...")
+
+        # Check the state again
+        end_state = get_state()
+        assert end_state == "RUNNING", f"Expected state to be 'RUNNING', but got {end_state}"
+
+    # If the state is "RUNNING" or "PAUSED", toggle the state to the other
+    elif original_state == "RUNNING":
+        print("System is in 'RUNNING' state. Toggling to 'PAUSED'.")
+        set_state("PAUSED")
+        end_state = get_state()
+        assert end_state == "PAUSED", f"Expected state to be 'PAUSED', but got {end_state}"
+
+    elif original_state == "PAUSED":
+        print("System is in 'PAUSED' state. Toggling to 'RUNNING'.")
+        set_state("RUNNING")
+        end_state = get_state()
+        assert end_state == "RUNNING", f"Expected state to be 'RUNNING', but got {end_state}"
+
+
 def test_run_log():
     """Test case for doing series of mutations to the state of the program and determining wheter it is correclty handled"""
     #First get the original state of the program:
-    current_state = get_request()
+    current_state = get_state()
     end_state = None
     # If the state is "INIT", log in (or perform required action) to change state
     if current_state == "INIT" and end_state == None:
