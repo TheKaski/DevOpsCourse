@@ -47,6 +47,7 @@ def set_state(state):
              capture_output=True,  # Capture the output
              text=True,  # Get the output as text
          )
+         print(f" The output is: {result.stdout}")
 
          # Check if the HTTP request was successful
          if result.returncode != 0:
@@ -71,6 +72,7 @@ def get_state():
             stderr=subprocess.PIPE,
             text=True,
         )
+        print(f" The output is: {result.stdout}")
 
         # Check for errors in the subprocess call
         if result.returncode != 0:
@@ -94,6 +96,7 @@ def get_request():
             stderr=subprocess.PIPE,
             text=True,
         )
+        print(f" The output is: {result.stdout}")
         # Check for errors in the subprocess call
         if result.returncode != 0:
             raise AssertionError(f"Curl command failed: {result.stderr.strip()}")
@@ -116,6 +119,7 @@ def get_runlog():
             stderr=subprocess.PIPE,
             text=True,
         )
+        print(f" The output is: {result.stdout}")
         # Check for errors in the subprocess call
         if result.returncode != 0:
             raise AssertionError(f"Curl command failed: {result.stderr.strip()}")
