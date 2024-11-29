@@ -27,6 +27,7 @@ api-test-job: # This job runs in the test stage.
     - curl -s http://$DOCKER_HOST_IP:8197/state
   script:
     - echo "Running api tests..."
+    - ./test_state.sh # Call the bash script
     - python3 tests/api_tests.py # Try running the test script
 
 deploy-job: # This job runs in the deploy stage.
