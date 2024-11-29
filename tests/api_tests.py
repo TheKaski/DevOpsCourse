@@ -62,8 +62,16 @@ def set_state(state):
 def get_state():
     """Get the current state using the GET /state endpoint."""
     try:
-        # Execute curl command to get both headers and body
-        result = subprocess.run(f"curl -s -D- ${BASE_URL}",shell=True, text=True, capture_output=True)
+       # Execute curl command with headers, capture both the headers and body
+        result = subprocess.run(
+            [
+                "curl", "-s", f"{BASE_URL}/state",
+                "-H", "Content-Type: text/plain", "-H", "Accept: text/plain"
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
         
         print(f" The output from {BASE_URL} GET /state is: {result.stdout}")
 
