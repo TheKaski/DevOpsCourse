@@ -101,6 +101,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
             # Encode the string into bytes before sending
             self.wfile.write(response_str.encode())
+            self.wfile.flush() 
             return
 
         # Anything else will result in 404     
