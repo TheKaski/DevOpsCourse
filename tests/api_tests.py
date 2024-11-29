@@ -102,13 +102,34 @@ def get_request():
 
     except Exception as e:
         raise AssertionError(f"Error occurred while sending request: {e}")
-# DEFINE THE TEST CASES HERE THAT CAN USE THE ENDPOINT FUNCTIONS DECRIBED ABOVE
+    
+def get_runlog():
+    """Trigger the request endpoint and validate Content-Type and status with curl."""
+    try:
+        # Execute curl command with headers, capture both the headers and body
+        result = subprocess.run(
+            [
+                "curl", "-s", f"{BASE_URL}/run-log",
+                "-H", "Content-Type: text/plain", "-H", "Accept: text/plain"
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        # Check for errors in the subprocess call
+        if result.returncode != 0:
+            raise AssertionError(f"Curl command failed: {result.stderr.strip()}")
+        # Return the response body
+        return result.stdout
 
+    except Exception as e:
+        raise AssertionError(f"Error occurred while sending request: {e}")
+
+# DEFINE THE TEST CASES HERE THAT CAN USE THE ENDPOINT FUNCTIONS DECRIBED ABOVE
 def test_state_should_equal_to(expected):
     """Test retrieving the state from the REST API"""
     output = get_state()
     assert output == expected, f"System should return the {expected} state as original state Instead was {output}"
-    print("State test passed")
 
 def test_request_endpoint():
     """Test retrieving the information of services from the REST API"""
@@ -116,7 +137,39 @@ def test_request_endpoint():
      # Check if the output contains both 'service1' and 'service2' in the plain text
     assert "service1" in output, f"System should return state including 'service1', instead got: {output}"
     assert "service2" in output, f"System should return state including 'service2', instead got: {output}"
-    print("Request test passed")
+
+def test_run_log():
+    """Test case for doing series of mutations to the state of the program and determining wheter it is correclty handled"""
+    #First get the original state of the program:
+    current_state = get_request()
+    end_state = None
+    # If the state is "INIT", log in (or perform required action) to change state
+    if current_state == "INIT" and end_state == None:
+        print("System is in 'INIT' state. Logging in...")
+        set_state("RUNNING")  # Assuming logging in means changing state to "RUNNING"
+        print("Logged in. Checking state again...")
+
+        # Check the state again
+        end_state = get_state()
+        assert current_state == "RUNNING", f"Expected state to be 'RUNNING', but got {current_state}"
+
+    # If the state is "RUNNING" or "PAUSED", toggle the state to the other
+    elif current_state == "RUNNING":
+        print("System is in 'RUNNING' state. Toggling to 'PAUSED'.")
+        set_state("PAUSED")
+        end_state = get_state()
+        assert current_state == "PAUSED", f"Expected state to be 'PAUSED', but got {current_state}"
+
+    elif current_state == "PAUSED":
+        print("System is in 'PAUSED' state. Toggling to 'RUNNING'.")
+        set_state("RUNNING")
+        end_state = get_state()
+        assert current_state == "RUNNING", f"Expected state to be 'RUNNING', but got {current_state}"
+
+    # Now takin the start and end states and ask for the run_log
+    runlog = get_runlog()
+    assert current_state in runlog, f"System should return state including 'service1', instead got: {runlog}"
+    assert end_state in runlog, f"System should return state including 'service2', instead got: {runlog}"
 
 
 #The main loop of this test program
@@ -127,6 +180,7 @@ if __name__ == "__main__":
     tests = [
         ("test_state_should_equal_to_INIT", lambda: test_state_should_equal_to("INIT")),
         ("test_request_endpoint", test_request_endpoint),
+        ("test_run_log", test_run_log)
     ]
 
     print(f"Running the tests now... the URL is {BASE_URL}")
