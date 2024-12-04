@@ -7,7 +7,7 @@ build-job:
   stage: build
   script:
     - echo "Setting up environment with Docker Compose"
-    - docker volume rm sync_services
+    - docker compose down --volumes
     - docker compose build
 
 api-test-job:
