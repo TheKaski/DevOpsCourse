@@ -140,6 +140,20 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(response_str.encode())
             self.wfile.flush() 
             return
+        
+        # NEW Feature of returning the STATE variable when asked:
+        if self.path =="/run-log":
+            logging.info("I RECEIVED A API REQUEST FOR RUNLOG STATE")
+            # Serve the HTML file
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain")
+            self.end_headers()
+
+            separator = '\n'
+            result = separator.join(runlog)
+            # Write the state data as plain text to the response body
+            self.wfile.write(result.encode())  # Encode to bytes as required by `wfile`
+            return
 
         # Anything else will result in 404     
         self.send_response(404)
