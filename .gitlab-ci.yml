@@ -18,7 +18,7 @@ api-test-job: # This job runs in the test stage.
   image: python:3.11-slim
   stage: test # It only starts when the job in the build stage completes successfully.
   before_script:
-    - apt-get update && apt-get install -y --no-install-recommends curl docker.io docker-compose python3-pip
+    - apt-get update && apt-get install -y --no-install-recommends curl docker.io docker-compose python3-pip build-essential libffi-dev python3-dev
     - pip install --no-cache-dir docker-compose # Install curl for Alpine-based images (docker:latest uses Alpine)
     - sleep 10
     - docker-compose ps
