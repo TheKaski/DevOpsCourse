@@ -25,7 +25,7 @@ api-test-job:
     - DOCKER_HOST_IP=$(docker network inspect bridge --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
     - export DOCKER_HOST_IP
     # Test the API endpoint
-    - curl http://$DOCKER_HOST_IP:8197
+    - curl -s http://$DOCKER_HOST_IP:8197
     - sleep 10
     # Send a PUT request to the endpoint
     - curl -X PUT -d "RUNNING" http://$DOCKER_HOST_IP:8197/state
