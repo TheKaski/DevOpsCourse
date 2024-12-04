@@ -210,14 +210,13 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             currentContainer.stop()
         except Exception as e:
             logging.error(f"Error stopping the containers: {e}")
+            
+def run():
+    logging.basicConfig(level=logging.INFO)
+    server_address = ('0.0.0.0', 8197)
+    httpd = HTTPServer(server_address, HTTPRequestHandler)
+    logging.info('Starting server...')
+    httpd.serve_forever()
 
-# Start the server:
-if __name__ == '__main__':
-    server = HTTPServer(('0.0.0.0', 5050), HTTPRequestHandler)
-    logging.info('Starting httpd...\n')
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    server.server_close()
-    logging.info('Stopping httpd...\n')
+if __name__ == "__main__":
+    run()
