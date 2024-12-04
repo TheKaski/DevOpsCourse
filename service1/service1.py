@@ -48,6 +48,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
                 self.send_response(500)
                 self.end_headers()
                 self.wfile.write("Internal Server Error".encode())
+            
+            return
 
         # Anything else will result in 404     
         self.send_response(404)

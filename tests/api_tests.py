@@ -214,7 +214,8 @@ if __name__ == "__main__":
     tests = [
         ("test_state_should_equal_to_INIT", lambda: test_state_should_equal_to("INIT")),
         ("test_request_endpoint", test_request_endpoint),
-        ("test_run_log", test_run_log)
+        ("test_sent_state", test_set_state),
+        ("test_run_log", test_set_state)
     ]
 
     print(f"Running the tests now... the URL is {BASE_URL}")
