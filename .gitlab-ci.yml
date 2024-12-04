@@ -1,41 +1,46 @@
-# Basic pipeline for the project.
-stages: # List of stages for jobs, and their order of execution
+tages:
   - build
   - test
   - deploy
 
-build-job: # This job runs in the build stage, which runs first with docker compose.
+build-job:
   stage: build
-  image: docker:latest
   before_script:
+    # Install required packages directly on the Ubuntu VM
+    - sudo apt-get update && sudo apt-get install -y curl python3 docker.io docker-compose python3-pip
     - docker info
     - docker-compose -v
   script:
     - echo "Setting up environment with Docker Compose"
     - docker-compose -f docker-compose.yaml up -d # Start services in detached mode
 
-api-test-job: # This job runs in the test stage.
-  image: alpine:latest
-  stage: test # It only starts when the job in the build stage completes successfully.
+api-test-job:
+  stage: test
   before_script:
-    - apk add --no-cache curl python3 docker docker-compose py3-pip # Install curl for Alpine-based images (docker:latest uses Alpine)
+    # Wait for Docker services to be fully up
     - sleep 10
+    # Check the status of the running containers
     - docker-compose ps
+    # Get the IP address of the Docker network bridge
     - DOCKER_HOST_IP=$(docker network inspect bridge --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
     - export DOCKER_HOST_IP
+    # Test the API endpoint
     - curl http://$DOCKER_HOST_IP:8197
     - sleep 10
+    # Send a PUT request to the endpoint
     - curl -X PUT -d "RUNNING" http://$DOCKER_HOST_IP:8197/state
   script:
-    - echo "Running api tests..."
-    - python3 tests/api_tests.py # Try running the test script
+    - echo "Running API tests..."
+    - python3 tests/api_tests.py # Run the actual API test script
 
-deploy-job: # This job runs in the deploy stage.
-  stage: deploy # It only runs when *both* jobs in the test stage complete successfully.
-  image: docker:latest
+deploy-job:
+  stage: deploy
+  before_script:
+    # Ensure docker-compose is installed and Docker is running
+    - sudo apt-get install -y docker-compose
+    - docker-compose -v
   script:
     - echo "Deploying application..."
     - docker-compose -f docker-compose.yaml down # Stop the currently running services
-    - docker-compose -f docker-compose.yaml up -d # Restart the services in detached mode again
-    - echo "Application successfully deployed."
+    - docker-compose -f docker-compose.yaml up -d # Restart the services in detached mode
     - echo "Application successfully deployed."
