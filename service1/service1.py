@@ -12,9 +12,10 @@ from datetime import datetime
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Service 1 should keep record of the STATE
-runlog = []
-current_state = "INIT"
+
+# Share the state with other service 1 replicas
+SYNCSTATEFILE = "/sync/state.txt"
+SYNCLOGFILE = "/sync/log.txt"
 
 # Define basic HTTPRequestHandler:
 class HTTPRequestHandler(BaseHTTPRequestHandler):
@@ -76,6 +77,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "text/plain")
             self.end_headers()
 
+            current_state = readSyncState()
             # Write the state data as plain text to the response body
             self.wfile.write(current_state.encode())  # Encode to bytes as required by `wfile`
 
@@ -111,10 +113,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "text/plain")
             self.end_headers()
 
-            separator = '\n'
-            result = separator.join(runlog)
+            current_log = readSyncLog()
             # Write the state data as plain text to the response body
-            self.wfile.write(result.encode())  # Encode to bytes as required by `wfile`
+            self.wfile.write(current_log.encode())  # Encode to bytes as required by `wfile`
             return
 
         # Anything else will result in 404     
@@ -124,7 +125,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
     # Create endpoint for PUT requests mainyl just PUT/state
     def do_PUT(self):
-        global current_state
+
          # Main endpoint for the excercise data retrieval: 
         if self.path == "/state":
             try:
@@ -138,11 +139,12 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
                 # Get the current timestamp
                 timestamp = datetime.now()
+                current_state = readSyncState()
 
                 # When the payload is received the program will change the state and log the state change in the run-log
-                runlog.append(f"${timestamp}: {current_state} -> {payload}")
-                current_state = payload
-
+                writeSyncLog(f"${timestamp}: {current_state} -> {payload}")
+                writeSyncState(payload)
+ 
                 # Respond to the request
                 self.send_response(200)
                 self.send_header("Content-Type", "text/plain")  # Set content type to plain text
@@ -210,6 +212,33 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             currentContainer.stop()
         except Exception as e:
             logging.error(f"Error stopping the containers: {e}")
+
+
+def readSyncState():
+    if not os.path.exists(SYNCSTATEFILE):
+            return "INIT"  # Default state
+    with open(SYNCSTATEFILE, "r") as f:
+            return f.read().strip() # JUst read the file
+
+
+def readSyncLog():
+    if not os.path.exists(SYNCLOGFILE):
+            return "This log is empty"  # Default log
+    with open(SYNCLOGFILE, "r") as f:
+            return f.read().strip() # Just read the file
+
+
+def writeSyncState(state):
+     with open(SYNCSTATEFILE, "w") as f:
+            f.write(state)
+
+
+def writeSyncLog(logEntry):
+     with open(SYNCLOGFILE, "w") as f:
+            f.write(logEntry)
+
+
+
 
 def run():
     logging.basicConfig(level=logging.INFO)

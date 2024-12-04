@@ -12,8 +12,9 @@ services:
       - service-network
       - loadbalancing
     volumes:
+      - sync_services:/sync
       - /var/run/docker.sock:/var/run/docker.sock  # Mount the Docker socket to run docker commands from the containers
-
+      
   service2:
     build: ./service2
     networks:
@@ -45,3 +46,8 @@ networks:
     driver: bridge
   loadbalancing:
     driver: bridge
+
+# Sync volume between service 1 replicas
+
+volumes:
+  sync_services:
