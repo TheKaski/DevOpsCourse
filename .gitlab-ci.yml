@@ -20,9 +20,6 @@ api-test-job:
     - export DOCKER_HOST_IP
     # Test the API endpoint
     - curl -s http://$DOCKER_HOST_IP:8197
-    - sleep 10
-    # Send a PUT request to the endpoint
-    - curl -X PUT -d "RUNNING" http://$DOCKER_HOST_IP:8197/state
   script:
     - echo "Running API tests..."
     - python3 tests/api_tests.py # Run the actual API test script
