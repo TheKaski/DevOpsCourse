@@ -15,11 +15,10 @@ build-job: # This job runs in the build stage, which runs first with docker comp
     - docker-compose -f docker-compose.yaml up -d # Start services in detached mode
 
 api-test-job: # This job runs in the test stage.
-  image: python:3.11-slim
+  image: alpine:latest
   stage: test # It only starts when the job in the build stage completes successfully.
   before_script:
-    - apt-get update && apt-get install -y --install-recommends curl docker.io docker-compose python3-pip build-essential libffi-dev python3-dev
-    - pip install --no-cache-dir docker-compose # Install curl for Alpine-based images (docker:latest uses Alpine)
+    - apk add --no-cache curl python3 docker docker-compose py3-pip # Install curl for Alpine-based images (docker:latest uses Alpine)
     - sleep 10
     - docker-compose ps
     - DOCKER_HOST_IP=$(docker network inspect bridge --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
