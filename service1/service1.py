@@ -18,44 +18,6 @@ current_state = "INIT"
 
 # Define basic HTTPRequestHandler:
 class HTTPRequestHandler(BaseHTTPRequestHandler):
-    # Create endpoint for PUT requests mainyl just PUT/state
-    def do_PUT(self):
-        global current_state
-         # Main endpoint for the excercise data retrieval: 
-        if self.path == "/state":
-            try:
-                content_length = int(self.headers.get('Content-Length', 0))  # Get the length of the payload
-                payload = self.rfile.read(content_length).decode('utf-8')  # Read and decode the payload
-
-                # Log the payload for debugging purposes
-                logging.info(f"Received payload: {payload}")
-
-                # TODO: additional error handling should be added to make sure state is not altered too broadly
-
-                # Get the current timestamp
-                timestamp = datetime.now()
-
-                # When the payload is received the program will change the state and log the state change in the run-log
-                runlog.append(f"${timestamp}: {current_state} -> {payload}")
-                current_state = payload
-
-                # Respond to the request
-                self.send_response(200)
-                self.send_header("Content-Type", "text/plain")  # Set content type to plain text
-                self.end_headers()
-                self.wfile.write(f"{payload}".encode())  # Echo back the payload for testing
-            except Exception as e:
-                logging.error(f"Error processing PUT request: {e}")
-                self.send_response(500)
-                self.end_headers()
-                self.wfile.write("Internal Server Error".encode())
-            
-            return
-
-        # Anything else will result in 404     
-        self.send_response(404)
-        self.end_headers()
-
     # Create endpoint for GET request:
     def do_GET(self):
         if self.path == "/shutdown":
@@ -155,6 +117,43 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(result.encode())  # Encode to bytes as required by `wfile`
             return
 
+        # Anything else will result in 404     
+        self.send_response(404)
+        self.end_headers()
+
+
+    # Create endpoint for PUT requests mainyl just PUT/state
+    def do_PUT(self):
+        global current_state
+         # Main endpoint for the excercise data retrieval: 
+        if self.path == "/state":
+            try:
+                content_length = int(self.headers.get('Content-Length', 0))  # Get the length of the payload
+                payload = self.rfile.read(content_length).decode('utf-8')  # Read and decode the payload
+
+                # Log the payload for debugging purposes
+                logging.info(f"Received payload: {payload}")
+
+                # TODO: additional error handling should be added to make sure state is not altered too broadly
+
+                # Get the current timestamp
+                timestamp = datetime.now()
+
+                # When the payload is received the program will change the state and log the state change in the run-log
+                runlog.append(f"${timestamp}: {current_state} -> {payload}")
+                current_state = payload
+
+                # Respond to the request
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain")  # Set content type to plain text
+                self.end_headers()
+                self.wfile.write(f"{payload}".encode())  # Echo back the payload for testing
+            except Exception as e:
+                logging.error(f"Error processing PUT request: {e}")
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write("Internal Server Error".encode())
+            return
         # Anything else will result in 404     
         self.send_response(404)
         self.end_headers()

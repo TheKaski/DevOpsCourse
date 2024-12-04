@@ -201,7 +201,6 @@ def test_run_log():
         end_state = get_state()
         assert end_state == "RUNNING", f"Expected state to be 'RUNNING', but got {end_state}"
         
-
     # Now takin the start and end states and ask for the run_log
     runlog = get_runlog()
     print(f"Output from the runlog was: {runlog}")
