@@ -25,7 +25,7 @@ api-test-job: # This job runs in the test stage.
     - export DOCKER_HOST_IP
     - curl http://$DOCKER_HOST_IP:8197
     - sleep 10
-    - curl -s http://$DOCKER_HOST_IP:8197/state
+    - curl -X PUT -d "RUNNING" http://$DOCKER_HOST_IP:8197/state
   script:
     - echo "Running api tests..."
     - python3 tests/api_tests.py # Try running the test script
