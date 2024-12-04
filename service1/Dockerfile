@@ -1,5 +1,5 @@
 # USe python 3 according to Docker.com instructions
-FROM python:3
+FROM python:3.12.6
 
 # Set the working directory in the container:
 WORKDIR /usr/src/app
@@ -11,7 +11,7 @@ RUN pip install psutil requests docker
 COPY . .
 
 # Expose the API port to the HOST
-EXPOSE 8000
+EXPOSE 5050
 
 # Run the python script
 CMD [ "python", "./service1.py"]
