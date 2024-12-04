@@ -7,12 +7,12 @@ build-job:
   stage: build
   script:
     - echo "Setting up environment with Docker Compose"
+    - docker volume rm sync_services
     - docker compose build
 
 api-test-job:
   stage: test
   before_script:
-    - docker volume rm sync_services # Clear the sync volume before running
     - docker compose up -d
     # Check the status of the running containers
     - docker-compose ps
