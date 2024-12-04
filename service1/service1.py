@@ -20,6 +20,7 @@ current_state = "INIT"
 class HTTPRequestHandler(BaseHTTPRequestHandler):
     # Create endpoint for PUT requests mainyl just PUT/state
     def do_PUT(self):
+        global current_state
          # Main endpoint for the excercise data retrieval: 
         if self.path == "/state":
             try:

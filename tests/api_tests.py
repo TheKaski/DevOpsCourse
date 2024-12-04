@@ -51,9 +51,7 @@ def set_state(state):
         # Check if the HTTP request was successful
         if result.returncode != 0:
             raise RuntimeError(f"Curl command failed: {result.stderr}")
-        if "200 OK" not in result.stdout:
-            raise AssertionError(f"Failed to set state to {state}: {result.stdout}")
-        print(f"State set successfully: {state}")
+        return result.stdout
 
     except Exception as e:
          raise RuntimeError(f"Error setting state: {str(e)}")
@@ -151,12 +149,13 @@ def test_set_state():
     # If the state is "INIT", log in (or perform required action) to change state
     if original_state == "INIT" and end_state == None:
         print("System is in 'INIT' state. Logging in...")
-        set_state("RUNNING")  # logging in means changing state to "RUNNING"
+        received_state = set_state("RUNNING")  # logging in means changing state to "RUNNING"
+        assert received_state == "RUNNING", f"Expected to received state in response to be 'RUNNING', but got {received_state}"
         print("Logged in. Checking state again...")
-
         # Check the state again
         end_state = get_state()
         assert end_state == "RUNNING", f"Expected state to be 'RUNNING', but got {end_state}"
+        return
 
     # If the state is "RUNNING" or "PAUSED", toggle the state to the other
     elif original_state == "RUNNING":
@@ -164,12 +163,14 @@ def test_set_state():
         set_state("PAUSED")
         end_state = get_state()
         assert end_state == "PAUSED", f"Expected state to be 'PAUSED', but got {end_state}"
+        return
 
     elif original_state == "PAUSED":
         print("System is in 'PAUSED' state. Toggling to 'RUNNING'.")
         set_state("RUNNING")
         end_state = get_state()
         assert end_state == "RUNNING", f"Expected state to be 'RUNNING', but got {end_state}"
+        return
 
 
 def test_run_log():
@@ -185,23 +186,25 @@ def test_run_log():
 
         # Check the state again
         end_state = get_state()
-        assert current_state == "RUNNING", f"Expected state to be 'RUNNING', but got {current_state}"
-
+        assert end_state == "RUNNING", f"Expected state to be 'RUNNING', but got {end_state}"
+        
     # If the state is "RUNNING" or "PAUSED", toggle the state to the other
     elif current_state == "RUNNING":
         print("System is in 'RUNNING' state. Toggling to 'PAUSED'.")
         set_state("PAUSED")
         end_state = get_state()
-        assert current_state == "PAUSED", f"Expected state to be 'PAUSED', but got {current_state}"
-
+        assert end_state == "PAUSED", f"Expected state to be 'PAUSED', but got {end_state}"
+        
     elif current_state == "PAUSED":
         print("System is in 'PAUSED' state. Toggling to 'RUNNING'.")
         set_state("RUNNING")
         end_state = get_state()
-        assert current_state == "RUNNING", f"Expected state to be 'RUNNING', but got {current_state}"
+        assert end_state == "RUNNING", f"Expected state to be 'RUNNING', but got {end_state}"
+        
 
     # Now takin the start and end states and ask for the run_log
     runlog = get_runlog()
+    print(f"Output from the runlog was: {runlog}")
     assert current_state in runlog, f"System should return state including 'service1', instead got: {runlog}"
     assert end_state in runlog, f"System should return state including 'service2', instead got: {runlog}"
 
@@ -214,8 +217,8 @@ if __name__ == "__main__":
     tests = [
         ("test_state_should_equal_to_INIT", lambda: test_state_should_equal_to("INIT")),
         ("test_request_endpoint", test_request_endpoint),
-        ("test_sent_state", test_set_state),
-        ("test_run_log", test_set_state)
+        ("test_set_state", test_set_state),
+        ("test_run_log", test_run_log)
     ]
 
     print(f"Running the tests now... the URL is {BASE_URL}")
