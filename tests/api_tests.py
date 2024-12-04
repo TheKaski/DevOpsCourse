@@ -3,6 +3,8 @@
 import os
 import subprocess
 
+USERNAME = "admin"
+PASSWORD = "secret"
 # Define the baseUrl of the service under testing
 host = os.getenv('DOCKER_HOST_IP', '127.0.0.1')  # Default to '127.0.0.1' if the environment variable is not set
 BASE_URL =  f"http://{host}:8197"
@@ -42,7 +44,8 @@ def set_state(state):
                 "curl",
                 "-X", "PUT",  # Specify the HTTP method
                 f"{BASE_URL}/state",  # Target URL
-                "-d", state  # Data payload
+                "-d", state,  # Data payload
+                "-u", f"{USERNAME}:{PASSWORD}"
             ],
             capture_output=True,  # Capture the output
             text=True,  # Get the output as text
