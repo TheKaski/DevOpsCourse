@@ -5,20 +5,14 @@ stages:
 
 build-job:
   stage: build
-  before_script:
-    # Install required packages directly on the Ubuntu VM
-    - sudo apt-get update && sudo apt-get install -y curl python3 docker.io docker-compose python3-pip
-    - docker info
-    - docker-compose -v
   script:
     - echo "Setting up environment with Docker Compose"
-    - docker-compose -f docker-compose.yaml up -d # Start services in detached mode
+    - docker compose build
 
 api-test-job:
   stage: test
   before_script:
-    # Wait for Docker services to be fully up
-    - sleep 10
+    - docker compose up -d
     # Check the status of the running containers
     - docker-compose ps
     # Get the IP address of the Docker network bridge
@@ -26,21 +20,13 @@ api-test-job:
     - export DOCKER_HOST_IP
     # Test the API endpoint
     - curl -s http://$DOCKER_HOST_IP:8197
-    - sleep 10
-    # Send a PUT request to the endpoint
-    - curl -X PUT -d "RUNNING" http://$DOCKER_HOST_IP:8197/state
   script:
     - echo "Running API tests..."
     - python3 tests/api_tests.py # Run the actual API test script
-
+    - docker compose down
 deploy-job:
   stage: deploy
-  before_script:
-    # Ensure docker-compose is installed and Docker is running
-    - sudo apt-get install -y docker-compose
-    - docker-compose -v
   script:
     - echo "Deploying application..."
-    - docker-compose -f docker-compose.yaml down # Stop the currently running services
-    - docker-compose -f docker-compose.yaml up -d # Restart the services in detached mode
+    - docker compose up -d
     - echo "Application successfully deployed."
