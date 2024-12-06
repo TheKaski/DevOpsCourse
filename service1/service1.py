@@ -17,11 +17,16 @@ logging.basicConfig(level=logging.INFO)
 SYNCSTATEFILE = "/sync/state.txt"
 SYNCLOGFILE = "/sync/log.txt"
 
+requireReLoginForStateChange = False
+
 # Define basic HTTPRequestHandler:
 class HTTPRequestHandler(BaseHTTPRequestHandler):
     # Create endpoint for GET request:
     def do_GET(self):
         if self.path == "/shutdown":
+            current_state = readSyncState()
+            timestamp = datetime.now()
+            writeSyncLog(f"${timestamp}: {current_state} -> {'SHUTDOWN'}")
             self.send_response(200)
             self.end_headers()
             self.shutdown_all_containers()
@@ -86,6 +91,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         # Main endpoint for the excercise data retrieval: 
         if self.path == "/request":
             logging.info("I RECEIVED A API REQUEST FOR CURRENT SERVICE INFO")
+            # Do not respond when PAUSED state is ative state
+            if readSyncState() == 'PAUSED':
+                 return
             # Send the response
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")  # Set content type to plain text
@@ -134,12 +142,37 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
                 # Log the payload for debugging purposes
                 logging.info(f"Received payload: {payload}")
-
-                # TODO: additional error handling should be added to make sure state is not altered too broadly
+                auth_header = self.headers.get('Authorization')
 
                 # Get the current timestamp
                 timestamp = datetime.now()
                 current_state = readSyncState()
+                
+                logging.info(f"Authorization header: {auth_header}")
+
+                # Check if transitioning to INIT state
+                if payload == "INIT":
+                    writeSyncState("INIT")  # Update state to INIT
+                    writeSyncLog(f"${timestamp}: {current_state} -> {payload}")
+                    logging.info("System state changed to INIT.")
+
+                    # Respond with a custom header to trigger re-authentication
+                    self.send_response(401)  # Or 200 with a custom header
+                    self.send_header("Content-Type", "text/plain")
+                    self.send_header("X-Reauthenticate", "true")  # Custom header for Nginx
+                    self.end_headers()
+                    self.wfile.write(f"{payload}".encode())
+                    self.wfile.write("State changed to INIT. Reauthentication required.".encode())
+                    return
+
+                # Check if the current state is INIT and no Authorization header is provided
+                if current_state == "INIT" and not auth_header:
+                    logging.info("Unauthorized attempt to modify state while in INIT.")
+                    self.send_response(403)  # Forbidden
+                    self.send_header("Content-Type", "text/plain")
+                    self.end_headers()
+                    self.wfile.write("Forbidden: Authorization required to modify state from INIT.".encode())
+                    return
 
                 # When the payload is received the program will change the state and log the state change in the run-log
                 writeSyncLog(f"${timestamp}: {current_state} -> {payload}")
@@ -213,32 +246,29 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         except Exception as e:
             logging.error(f"Error stopping the containers: {e}")
 
-
+# Function for reading the state from synced state file
 def readSyncState():
     if not os.path.exists(SYNCSTATEFILE):
             return "INIT"  # Default state
     with open(SYNCSTATEFILE, "r") as f:
             return f.read().strip() # JUst read the file
 
-
+# Function for reading the contents of synced log file
 def readSyncLog():
     if not os.path.exists(SYNCLOGFILE):
             return "This log is empty"  # Default log
     with open(SYNCLOGFILE, "r") as f:
             return f.read().strip() # Just read the file
 
-
+# Function for writing new state to the synced state file
 def writeSyncState(state):
      with open(SYNCSTATEFILE, "w") as f:
             f.write(state)
 
-
+# Function for appending new log entry to the synced log file
 def writeSyncLog(logEntry):
-     with open(SYNCLOGFILE, "w") as f:
-            f.write(logEntry)
-
-
-
+     with open(SYNCLOGFILE, "a") as f:
+            f.write(logEntry + '\n')
 
 def run():
     logging.basicConfig(level=logging.INFO)

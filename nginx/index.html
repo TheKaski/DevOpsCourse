@@ -2,9 +2,10 @@
 <html>
 
 <head>
-    <title>Excercise4 website with nginx gateway</title>
+    <title>DevOps Project website with nginx and APIgateway</title>
     <script>
-         async function fetchServiceData() {
+        // Function for fetching the request data from the backend. When received writes the data to dom with function writeRequestDataInDom
+        async function fetchServiceData() {
                 try {
                     // Make an API call to the Nginx proxy which will forward it to service1
                     const response = await fetch('/api/');
@@ -13,40 +14,132 @@
                     }
 
                     // Parse the JSON response
-                    const data= await response.json();
+                    const data = await response.json();
                     console.log(data)
-
-                    // Populate Service 1 Data
-                    document.getElementById('service1-ip').textContent = data[0].service1.ip_address;
-                    document.getElementById('service1-processes').textContent = data[0].service1.running_processes;
-                    document.getElementById('service1-uptime').textContent = data[0].service1.uptime;
-                    document.getElementById('service1-diskspace').textContent = data[0].service1.available_disk_space;
-
-                    // Populate Service 2 Data
-                    document.getElementById('service2-ip').textContent = data[1].service2.ip_address;
-                    document.getElementById('service2-processes').textContent = data[1].service2.running_processes;
-                    document.getElementById('service2-uptime').textContent = data[1].service2.uptime;
-                    document.getElementById('service2-diskspace').textContent = data[1].service2.available_disk_space;
+                    writeRequestDataInDom(data)
+                   
                 } catch (error) {
                     console.error('There was a problem with the fetch operation:', error);
                 }
             }
+
+        // Callback function for stopping the whole system
         async function stopServices() {
             const response = await fetch('/api/shutdown');
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
         }
+
+        // Callback function for fetching state of the system
+        async function fetchState() {
+                const response = await fetch('/api/state');
+                const state = await response.text()
+                //The response is plain text so:
+                writeStateInDom(state)
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+        }
+
+         // Callback function for fetching state of the system
+        async function fetchLog() {
+                const response = await fetch('/api/run-log');
+                const state = await response.text()
+                //The response is plain text so:
+                writeLogInDom(state)
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+        }
+
+        // Function for setting the system to new state
+        async function setState(newState) {
+            try {
+                const response = await fetch('/api/state', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: newState,
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                const state = await response.text(); // The response is plain text
+                writeStateInDom(state);
+                } catch (error) {
+                    console.error('Error fetching state:', error);
+                }
+        }
+
+        // Function for manipulating DOM with the updated REQUEST data
+        async function writeRequestDataInDom(data) {
+             // Populate Service 1 Data
+            document.getElementById('service1-ip').textContent = data[0].service1.ip_address;
+            document.getElementById('service1-processes').textContent = data[0].service1.running_processes;
+            document.getElementById('service1-uptime').textContent = data[0].service1.uptime;
+            document.getElementById('service1-diskspace').textContent = data[0].service1.available_disk_space;
+
+            // Populate Service 2 Data
+            document.getElementById('service2-ip').textContent = data[1].service2.ip_address;
+            document.getElementById('service2-processes').textContent = data[1].service2.running_processes;
+            document.getElementById('service2-uptime').textContent = data[1].service2.uptime;
+            document.getElementById('service2-diskspace').textContent = data[1].service2.available_disk_space;
+        }
+        // Function for manipulating DOM with the updated STATE data
+        async function writeStateInDom(state) {
+                console.log(state)
+                document.getElementById('service1-state').textContent = state;
+        }
+        // Function for manipulating DOM with the updated STATE data
+        async function writeLogInDom(log) {
+                console.log(log)
+                document.getElementById('service1-log').textContent = log;
+        }
+
+        window.onload = async function () {
+                try {
+                    // Fetch the current state from the backend
+                    const response = await fetch('/api/state');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch system state: ' + response.statusText);
+                    }
+
+                    const currentState = await response.text();
+
+                    // Log the state for debugging
+                    console.log('Current state:', currentState);
+
+                    // Only set the state to RUNNING if it's INIT
+                    if (currentState === 'INIT') {
+                        await setState('RUNNING');
+                    }
+                } catch (error) {
+                    console.error('Error during page load:', error);
+                }
+            };
     </script>
 </head>
 
 <body>
     <h1>Welcome to My Website foor excercise 4</h1>
     <button onClick="fetchServiceData()">REQUEST</button>
+    <button onclick="fetchState()">UpdateState</button>
+    <button onclick="fetchLog()">UpdateLog</button>
     <button onclick="stopServices()">STOP</button>
+    <button onclick="setState('PAUSED')">PAUSED</button>
+    <button onclick="setState('RUNNING')">RUNNING</button>
+    <button onclick="setState('INIT')">INIT</button>
 
     <h1>Service dashboard</h1>
     <h2>Service 1:</h2>
+    <pre id="service1-state"></pre>
+
+    <pre id="service1-log"></pre>
+
     <pre id="service1-ip"></pre>
     <h3>Processes:</h3>
     <pre id="service1-processes"></pre>
