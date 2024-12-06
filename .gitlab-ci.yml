@@ -24,6 +24,7 @@ api-test-job:
   script:
     - echo "Running API tests..."
     - python3 tests/api_tests.py # Run the actual API test script
+    - docker-compose down --volumes --remove-orphans
 
 deploy-job:
   stage: deploy
