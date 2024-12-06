@@ -55,6 +55,18 @@
                 }
         }
 
+        // Callback function for fetching state of the system
+        async function fetchRequest() {
+            const response = await fetch('/api/request');
+            const result = await response.text()
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            //The response is plain text so:
+            writeRequestInDom(result)
+        }
+
+
         // Function for setting the system to new state
         async function setState(newState) {
             try {
@@ -99,6 +111,10 @@
                 console.log(log)
                 document.getElementById('service1-log').textContent = log;
         }
+        async function  writeRequestInDom(result) 
+        {
+            document.getElementById('service1-request').textContent = result;
+        }
 
         window.onload = async function () {
                 try {
@@ -126,7 +142,8 @@
 
 <body>
     <h1>Welcome to My Website foor excercise 4</h1>
-    <button onClick="fetchServiceData()">REQUEST</button>
+    <button onClick="fetchServiceData()">REQUEST JSON</button>
+    <button onClick="fetchRequest()">REQUEST plainText</button>
     <button onclick="fetchState()">UpdateState</button>
     <button onclick="fetchLog()">UpdateLog</button>
     <button onclick="stopServices()">STOP</button>
@@ -139,6 +156,7 @@
     <pre id="service1-state"></pre>
 
     <pre id="service1-log"></pre>
+    <pre id="service1-request"></pre>
 
     <pre id="service1-ip"></pre>
     <h3>Processes:</h3>
